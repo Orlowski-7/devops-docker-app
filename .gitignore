@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.pyc
+
+# env (na przyszłość)
+.venv/
+
+# Docker
+*.log
+
+# system
+.DS_Store

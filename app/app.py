@@ -1,6 +1,7 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 import psycopg2
 import time
+from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 
 app = Flask(__name__)
 
@@ -10,6 +11,18 @@ DB_CONFIG = {
     "user": "devops",
     "password": "devops"
 }
+
+REQUEST_COUNT = Counter(
+    "app_request_count",
+    "Total number of requests",
+    ["method", "endpoint"]
+)
+
+REQUEST_LATENCY = Histogram(
+    "app_request_latency_seconds",
+    "Request latency in seconds",
+    ["endpoint"]
+)
 
 
 def get_db_connection(retries=10, delay=2):
@@ -25,6 +38,22 @@ def get_db_connection(retries=10, delay=2):
             time.sleep(delay)
 
     raise last_error
+
+
+@app.before_request
+def before_request():
+    request.start_time = time.time()
+
+
+@app.after_request
+def after_request(response):
+    endpoint = request.path
+    latency = time.time() - getattr(request, "start_time", time.time())
+
+    REQUEST_COUNT.labels(method=request.method, endpoint=endpoint).inc()
+    REQUEST_LATENCY.labels(endpoint=endpoint).observe(latency)
+
+    return response
 
 
 @app.route("/")
@@ -75,6 +104,11 @@ def get_data():
 
     result = [{"id": row[0], "content": row[1]} for row in rows]
     return jsonify(result)
+
+
+@app.route("/metrics")
+def metrics():
+    return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
 
 
 if __name__ == "__main__":

@@ -179,7 +179,8 @@ git branch -v // aktualny commit tytuł
     czy użytkownik ma problem
     czy zasoby się kończą
     dopiero potem bardziej szczegółowe rzeczy
-    Zapamiętaj #5
+
+    // Zapamiętaj #5
 
     Response time > samo CPU
 
@@ -195,3 +196,67 @@ git branch -v // aktualny commit tytuł
     infrastruktura
 
     To porządkuje myślenie i debug.
+
+    // Zapamiętaj #7
+
+    /metrics to standardowy endpoint dla Prometheusa.
+
+    To bardzo częsty wzorzec:
+
+    aplikacja wystawia metryki
+    Prometheus je scrapuje
+    Grafana je wizualizuje
+
+    // Zapamiętaj #8
+
+    Nie logika aplikacji monitoruje system.
+    Aplikacja tylko udostępnia metryki.
+
+    To Prometheus jest tym, który je zbiera.
+
+    // Zapamiętaj #9
+
+    Prometheus nie „wie” sam z siebie, co monitorować.
+    Trzeba mu powiedzieć:
+
+    gdzie iść
+    jaki endpoint scrapować
+    jak często
+
+    Czyli to Ty definiujesz źródła prawdy.
+
+    // Zapamiętaj #10
+
+    Grafana nie zbiera danych.
+    Grafana tylko je pokazuje.
+
+    Czyli podział jest taki:
+
+    app wystawia /metrics
+    Prometheus zbiera
+    Grafana wizualizuje
+
+    To bardzo ważny model.
+
+
+    <<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>
+
+                    L: admin
+                    Hasło Gfana @Admin#
+    <<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>
+
+    W środku kontenerów localhost oznacza ten konkretny kontener, a nie Twój komputer.
+
+    // Zapamiętaj #11
+
+    W środku kontenerów localhost oznacza ten konkretny kontener, a nie Twój komputer.
+
+    To dlatego Grafana łączy się do:
+
+    http://prometheus:9090
+
+    a nie do localhost:9090.
+
+    To jest jedna z najważniejszych rzeczy w Dockerze.
+
+    

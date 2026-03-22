@@ -1,7 +1,5 @@
-version: "3.9"
 
 services:
-
   app:
     build: ./app
     container_name: web-app
@@ -10,6 +8,11 @@ services:
       - "5000:5000"
     depends_on:
       - db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   db:
     image: postgres:15
@@ -22,10 +25,16 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devops -d devopsdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   nginx:
     image: nginx:latest
     container_name: nginx-proxy
+    restart: always
     ports:
       - "8080:80"
     volumes:

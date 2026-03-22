@@ -33,3 +33,12 @@ docker-compose config // Sprawdza składnię YAML
 
 Jeśli nie chce zbudować środowiska prune -a i restart !!!
 
+## Git init and push
+
+git init
+git add .
+git commit -m "Initial DevOps project: Dockerized app with Nginx and PostgreSQL"
+
+git remote add origin https://github.com/TWOJ_LOGIN/devops-docker-app.git
+git branch -M main
+git push -u origin main

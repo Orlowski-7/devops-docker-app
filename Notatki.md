@@ -259,4 +259,45 @@ git branch -v // aktualny commit tytuł
 
     To jest jedna z najważniejszych rzeczy w Dockerze.
 
-    
+
+    rate(app_request_count_total[1m])
+
+    % ile requestów na sekundę
+    % w ostatniej minucie
+
+    rate(app_request_latency_seconds_sum[1m]) 
+    /
+    rate(app_request_latency_seconds_count[1m]) 
+
+    % średni czas odpowiedzi
+        
+    app_request_count_total
+
+    % ile requestów było od startu
+
+    // Zapamiętaj #12
+
+    Prometheus NIE przechowuje „średniej”.
+
+    👉 musisz ją policzyć sam:
+
+    sum / count
+
+    To jest klasyczny wzorzec.
+
+    // Zapamiętaj #13
+
+    rate(...) to jedna z najważniejszych funkcji.
+
+    👉 mówi „jak szybko coś rośnie”
+
+    Czyli:
+
+    ile requestów na sekundę
+    ile błędów na sekundę
+
+<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>
+    CMD: // Test 
+    curl.exe http://localhost:8080/data
+<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>
+

@@ -24,6 +24,18 @@ REQUEST_LATENCY = Histogram(
     ["endpoint"]
 )
 
+ERROR_COUNT = Counter(
+    "app_error_count",
+    "Total number of errors",
+    ["endpoint"]
+)
+
+RESPONSE_COUNT = Counter(
+    "app_response_count",
+    "Total number of responses",
+    ["method", "endpoint", "status"]
+)
+
 
 def get_db_connection(retries=10, delay=2):
     last_error = None
@@ -52,6 +64,11 @@ def after_request(response):
 
     REQUEST_COUNT.labels(method=request.method, endpoint=endpoint).inc()
     REQUEST_LATENCY.labels(endpoint=endpoint).observe(latency)
+    RESPONSE_COUNT.labels(
+        method=request.method,
+        endpoint=endpoint,
+        status=str(response.status_code)
+    ).inc()
 
     return response
 
@@ -109,6 +126,11 @@ def get_data():
 @app.route("/metrics")
 def metrics():
     return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    ERROR_COUNT.labels(endpoint=request.path).inc()
+    return {"error": str(e)}, 500
 
 
 if __name__ == "__main__":

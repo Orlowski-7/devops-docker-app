@@ -301,3 +301,195 @@ git branch -v // aktualny commit tytuł
     curl.exe http://localhost:8080/data
 <<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>
 
+    // Zapamiętaj #14
+
+    👉 błędy też są metryką
+
+    To jest jedna z najważniejszych rzeczy w monitoring:
+
+    request count = ruch
+    latency = wydajność
+    error rate = stabilność
+
+    // Error Rate 
+
+    rate(app_error_count_total[1m])
+
+    // Zapamiętaj #16
+
+    W monitoringu ważniejsze od „czy jest wykres” jest:
+
+    czy metryka naprawdę istnieje
+    czy Prometheus ją scrapuje
+    czy query odpowiada temu, co naprawdę liczysz
+
+    To jest jedna z najważniejszych praktycznych lekcji w DevOps.
+
+    // Zapamiętaj #17 (bardzo ważne)
+
+    Monitoring czasem „kłamie przez chwilę”, zanim się ustabilizuje
+
+    To NIE znaczy, że system nie działa.
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WAŻNE DO WYKRESÓW>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+rate(app_request_count_total[1m])
+
+rate(app_request_latency_seconds_sum[1m]) 
+/
+rate(app_request_latency_seconds_count[1m])
+
+rate(app_request_count_total[1m])
+
+rate(app_error_count_total[1m])
+
+app_request_count_total <-- Istotne do wyświetlenia całokształtu ? 
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    // Zapamiętaj #18
+
+    Labelki (endpoint, method) = mega potężne narzędzie
+
+    To pozwala:
+
+    rozbić ruch
+    znaleźć problematyczny endpoint
+    analizować system
+
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Skrypt do generowania ruchu>>>>>>>>>>>>>>>>>>>>>>>
+
+            for ($i=0; $i -lt 100; $i++) {
+            curl.exe http://localhost:8080/data
+            }
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    // Zapamiętaj #19
+
+    Latency nie zawsze musi rosnąć od samej liczby requestów.
+    Rośnie wtedy, gdy system zaczyna dochodzić do limitów:
+
+    CPU
+    RAM
+    połączeń do DB
+    czasu odpowiedzi bazy
+    blokad / kolejek
+
+    Czyli bardziej precyzyjnie:
+
+    większy ruch może zwiększyć latency, jeśli któryś komponent staje się bottleneckiem
+
+    To ważna różnica, bo na rozmowie takie doprecyzowanie robi bardzo dobre wrażenie.
+
+    // Zapamiętaj #20
+
+    Counter zawsze rośnie
+    Poza restartem procesu / kontenera.
+
+    Dlatego do obserwacji ruchu zwykle nie patrzysz na sam counter, tylko na:
+
+    rate(...)
+
+    // Zapamiętaj #21
+
+    Grafana pokazuje to, o co zapytasz.
+    Jeśli query jest słabe, dashboard też będzie słaby.
+
+    Czyli:
+
+    metryka może być dobra
+    a dashboard bezużyteczny
+    bo pytasz o złą rzecz
+
+    To jest bardzo praktyczna lekcja.
+
+    // Zapamiętaj #22
+
+    Monitoring ma odpowiadać na pytania operacyjne, np.:
+
+    czy aplikacja działa?
+    czy ruch rośnie?
+    czy odpowiedzi są coraz wolniejsze?
+    czy użytkownik dostaje błędy?
+
+    Nie chodzi o „ładne wykresy”.
+
+    // Zapamiętaj #23
+
+    W tym projekcie:
+
+    zmiana pliku lokalnie ≠ zmiana w działającym kontenerze
+    kontener ma własny filesystem zbudowany z obrazu
+
+    Czyli po zmianach w kodzie robisz:
+
+    docker-compose up --build
+
+    albo bezpieczniej:
+
+    docker-compose down
+    docker-compose up --build
+
+    Jeśli chcesz mieć pewność, że naprawdę wstała nowa wersja, to właśnie tak.
+
+    Bardzo ważna uwaga do Twojego handlera błędów:
+
+                @app.errorhandler(Exception)
+            def handle_exception(e):
+                ERROR_COUNT.labels(endpoint=request.path).inc()
+                return {"error": str(e)}, 500
+    
+    // Zapamiętaj #24
+
+    Ten handler zliczy wyjątki, ale nie zliczy np. świadomie zwróconego:
+    
+    400
+    404 ,bo to nie zawsze są wyjątki.
+
+    Dlatego RESPONSE_COUNT jest tak naprawdę ważniejszą metryką operacyjną niż ERROR_COUNT.
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WAŻNE DO WYKRESÓW>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    rate(app_request_count_total[1m])
+
+    rate(app_request_latency_seconds_sum[1m]) 
+    /
+    rate(app_request_latency_seconds_count[1m])
+
+    rate(app_request_count_total[1m])
+
+    rate(app_error_count_total[1m])
+
+    app_request_count_total <-- Istotne do wyświetlenia całokształtu ? 
+
+    rate(app_response_count_total{status=~"5.."}[1m])
+
+    rate(app_response_count_total{status=~"4..|5.."}[1m])
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    // Zapamiętaj #25
+
+    Regex w Prometheus:
+
+    =~  → match regex
+    =   → exact match
+
+    Przykłady:
+
+    status="200"        ✔ dokładnie
+    status=~"2.."       ✔ wszystkie 2xx
+    status=~"4..|5.."   ✔ 4xx i 5xx
+
+    // Zapamiętaj #26
+
+    Brak danych ≠ błąd query
+
+    Często:
+
+    query jest poprawne
+    ale metryka jeszcze nie istnieje
+
+    

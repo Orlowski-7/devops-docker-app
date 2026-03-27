@@ -37,3 +37,16 @@ Containers communicate via service names
 Docker volumes and initialization scripts
 Debugging Docker issues (cache, mounts)
 
+## Monitoring
+Prometheus zbiera metryki z /metrics
+Grafana wizualizuje:
+request rate
+latency
+error rate
+success rate
+
+## Ports
+app → 8080
+grafana → 3000
+prometheus → 9090
+

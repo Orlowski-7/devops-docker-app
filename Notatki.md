@@ -464,6 +464,8 @@ app_request_count_total <-- Istotne do wyświetlenia całokształtu ?
 
     app_request_count_total <-- Istotne do wyświetlenia całokształtu ? 
 
+    WAŻNE!! Poniższe w trybie code nie builder 
+
     rate(app_response_count_total{status=~"5.."}[1m])
 
     rate(app_response_count_total{status=~"4..|5.."}[1m])
@@ -492,4 +494,180 @@ app_request_count_total <-- Istotne do wyświetlenia całokształtu ?
     query jest poprawne
     ale metryka jeszcze nie istnieje
 
-    
+    // Zapamiętaj #27
+
+    Monitoring pokazuje to, co naprawdę wydarzyło się w systemie.
+    Nie to, co „mogłoby się wydarzyć”.
+
+    Czyli jeśli nie było:
+
+    400
+    500
+
+    to nie będzie danych dla tych statusów.
+
+    // Zapamiętaj #28
+
+    Brak danych w monitoringu może być poprawnym stanem.
+    Nie każdy brak wykresu oznacza awarię.
+
+    Zapamiętaj #29
+
+    Aby testować monitoring, czasem trzeba świadomie wygenerować zdarzenie:
+
+    ruch
+    błąd
+    przeciążenie
+
+    To jest bardzo praktyczne i bardzo „DevOpsowe”.
+
+    // Zapamiętaj #30
+
+    W Grafanie są dwa różne tryby pracy z query:
+
+    Builder
+
+    Dobry do prostych klikanych rzeczy.
+
+    Code
+
+    Lepszy do prawdziwego PromQL.
+
+    Przy regexach, rate, filtrach po labelach:
+    👉 Code jest po prostu lepszy.
+
+    // Zapamiętaj #31
+
+    Jeśli metryka ma dużo labeli, to bez filtrowania będziesz widział szum.
+
+    U Ciebie szum robią:
+
+    /metrics
+    /health
+
+    Dlatego warto filtrować po:
+
+    endpoint
+    status
+    czasem method
+
+    // Zapamiętaj #32
+
+    👉 Grafana Builder ≠ pełny PromQL
+
+    Builder → prosty UI
+    Code → prawdziwe query
+
+    I w praktyce:
+
+    80% sensownej pracy robisz w Code
+
+    // Zapamiętaj #33
+
+    👉 Debugowanie monitoringu = 3 warstwy
+
+    Czy metryka istnieje? (Prometheus /metrics)
+    Czy Prometheus ją widzi? (/targets, query)
+    Czy Grafana poprawnie pyta?
+
+    Ty właśnie przeszedłeś cały ten flow.
+
+    WYWOŁANIE BŁĘDU 400: 
+
+    curl.exe -X POST http://localhost:8080/data -H "Content-Type: application/json" -d "{}"
+
+    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<WAŻNE DO WYKRESÓW>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    rate(app_request_count_total[1m])
+
+    rate(app_request_latency_seconds_sum[1m]) 
+    /
+    rate(app_request_latency_seconds_count[1m])
+
+    rate(app_request_count_total[1m])
+
+    rate(app_error_count_total[1m])
+
+    app_request_count_total <-- Istotne do wyświetlenia całokształtu ? 
+
+    WAŻNE!! Poniższe w trybie code nie builder 
+
+    rate(app_response_count_total{status=~"5.."}[1m])
+
+    rate(app_response_count_total{status=~"4..|5.."}[1m])
+
+    -----------------------------------------------------------------------------------------
+
+    Gotowy zestaw monitorowania endpointów na ten moment 27.03
+
+    rate(app_request_count_total{endpoint="/data"}[1m])
+    👉 ile requestów trafia do API
+
+    rate(app_request_latency_seconds_sum{endpoint="/data"}[1m]) 
+    /
+    rate(app_request_latency_seconds_count{endpoint="/data"}[1m])
+    👉 ile requestów trafia do API
+
+    rate(app_response_count_total{endpoint="/data",status=~"4..|5.."}[1m])
+    👉 jak szybko odpowiada app
+
+    rate(app_response_count_total{endpoint="/data",status=~"2.."}[1m])
+    👉 ile requestów kończy się sukcesem
+
+    rate(app_response_count_total{endpoint="/data"}[1m])
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    // Zapamiętaj #34
+
+    To jest klasyczny zestaw:
+
+    request rate → ruch
+    latency → wydajność
+    error rate → stabilność
+    success rate → zdrowie systemu
+
+    To jest dokładnie to, co się monitoruje w realnych systemach.
+
+    🔥 Mini symulacja (ważne)
+
+    Zrób:
+
+    1️⃣ Spam dobrych requestów
+    curl.exe http://localhost:8080/data
+    2️⃣ Spam błędnych requestów
+    curl.exe -X POST http://localhost:8080/data -H "Content-Type: application/json"
+
+    // Zapamiętaj #35
+
+    👉 Monitoring musi być czytelny
+
+    Nie chodzi o to, żeby:
+
+    - mieć dużo danych
+
+    - Chodzi o to, żeby:
+
+    - widzieć to, co ważne
+
+    // Zapamiętaj #36
+
+    👉 /metrics i /health prawie zawsze trzeba filtrować
+
+    Bo:
+
+    generują szum
+    zaburzają analizę
+    nie reprezentują realnego ruchu usera
+
+    // Zapamiętaj #37
+
+    👉 Zawsze commituj w momentach „stabilnych milestone’ów”
+
+    Czyli:
+
+    działa ✔
+    rozumiesz ✔
+    możesz wrócić ✔
+
+    To jest bardzo ważny nawyk.

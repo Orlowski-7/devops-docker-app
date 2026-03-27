@@ -671,3 +671,144 @@ app_request_count_total <-- Istotne do wyświetlenia całokształtu ?
     możesz wrócić ✔
 
     To jest bardzo ważny nawyk.
+
+
+    --------------------------------------- Monitoring infrastruktury --------------------------
+
+
+    🚀 NOWY ETAP (i to jest ważne)
+
+    Wchodzimy w:
+
+    🧱 Monitoring infrastruktury (CPU / RAM / kontenery)
+
+    Czyli coś, co:
+
+    👉 bardzo często pada na rozmowach
+    👉 bardzo mało ludzi umie dobrze zrobić
+
+    🎯 Cel następnego etapu
+
+    Chcemy widzieć:
+
+    CPU usage kontenerów
+    RAM usage
+    network
+    disk I/O
+    🔧 Jak to robimy
+
+    Dodajemy:
+
+    🔹 cAdvisor
+
+    To jest narzędzie od Google, które:
+
+    👉 zbiera metryki kontenerów Dockera
+
+    // Zapamiętaj #38
+
+    👉 Prometheus nie widzi Dockera „sam z siebie”
+
+    On widzi tylko:
+
+    to co wystawisz jako endpoint
+
+    Czyli:
+
+    app → /metrics
+    Docker → przez cAdvisor
+
+    // Zapamiętaj #39 (wersja „na rozmowę”)
+
+    Monitoring aplikacji pokazuje objawy,
+    monitoring infrastruktury pokazuje przyczynę.
+
+    🎯 Przykład (bardzo ważny)
+
+    Masz:
+
+    latency rośnie
+    error rate rośnie
+
+    👉 Monitoring aplikacji mówi:
+
+    „coś jest nie tak”
+
+    Ale dopiero monitoring infra powie:
+
+    CPU = 100% → bottleneck CPU
+    RAM = brak → OOM / swap
+    DB = przeciążona → wolne query
+    network → timeouty
+
+    👉 czyli:
+
+    „dlaczego coś jest nie tak”
+
+    🧠 Zapamiętaj #40
+
+    👉 Bez infra monitoringu jesteś ślepy na przyczynę problemu
+
+    Masz tylko:
+
+    symptomy (slow, error)
+
+    Nie masz:
+
+    root cause
+    🔥 I to jest bardzo ważna rzecz
+
+    To co robisz teraz to:
+
+    👉 łączysz:
+
+    aplikację
+    metryki
+    infrastrukturę
+
+----------------------------- Infra Monitoring ----------------------------------------------
+
+    // Panel 1 — CPU usage
+
+    rate(container_cpu_usage_seconds_total[1m])
+    👉 pokazuje użycie CPU w czasie
+
+    // lepsza wersja (per container)
+    rate(container_cpu_usage_seconds_total{name=~".+"}[1m])
+
+    // Panel 2 — RAM usage
+    
+    container_memory_usage_bytes
+    👉 ile RAM używa kontener
+
+    // Panel 3 — Network
+
+    rate(container_network_receive_bytes_total[1m])
+    👉 ile danych przychodzi
+
+    // Panel 4 — Network OUT
+
+    rate(container_network_transmit_bytes_total[1m])
+    👉 ile danych wychodzi
+
+    // MAŁY PRO TIP (ważny)
+
+    cAdvisor zwraca dużo śmieci (systemowe kontenery).
+
+    Dlatego filtruj:
+
+    rate(container_cpu_usage_seconds_total{name=~"devops-docker-app.*"}[1m])
+
+    albo po:
+
+    container_label_com_docker_compose_service
+
+-------------------------------------------------------------------------------------------
+
+    // Zapamiętaj #41
+
+    👉 container metrics ≠ app metrics
+
+    app → requesty, latency
+    container → CPU, RAM
+
